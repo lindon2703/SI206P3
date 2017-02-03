@@ -48,7 +48,9 @@ regex= r"\S+\.\w+"
 file_paths= re.findall(regex, data, re.MULTILINE)
 file_paths_num= len(file_paths)
 ## (b) Write Python code to determine how many of these paths are FULL paths, not relative paths. Save that number in the variable full_paths_num.
-
+regex= r"(\~\/|\/User)(\S*)"
+full_paths= re.findall(regex, data, re.MULTILINE)
+full_paths_num= len(full_paths)
 ## (c) Write Python code to determine how many of these paths describe a Python file saved inside a folder called SI206. Save that number in the variable python_course_paths.
 regex= r"\/*SI206\S*\.py"
 Si206py= re.findall(regex, data, re.MULTILINE)
