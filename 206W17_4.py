@@ -19,9 +19,15 @@ file= open("nytimes_data.html", 'w')
 file.write(response)
 file.close()
 #####################
-
 ## PART 2 (200 points)
 ## Write code to get the first 10 headlines from the New York Times, based on the data you saved in the file in Part 1, and save those strings in a list called nytimes_headlines. 
+filename= open("nytimes_data.html", 'r').read()
+soup = BeautifulSoup(filename, 'html.parser')
+headlines= soup.find_all("h2", "story-heading")
+#print (type(headlines))
+#print (len(headlines))
+#print (len(headlines[0]))
+nytimes_headlines=[ str(x) for x in headlines[:10]]
 
 ## Note that you will almost certainly need to do some investigation on the http://nytimes.com website to do this correctly, even after saving the file in Part 1.
 
@@ -53,7 +59,8 @@ file.close()
 ## Go to this URL: https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All
 
 ## Use the requests library (or other Python code that has the same effect) and Beautiful Soup to gather, from that web page, each of the names and the titles.
-## You should create a dictionary called umsi_titles which contains the names and the titles for each person on that page. For example, your dictionary should include the following key-value pairs (and a bunch more...):
+## You should create a dictionary called umsi_titles which contains the names and the titles for each person on that page. For example, your dictionary should 
+## include the following key-value pairs (and a bunch more...):
 
 ## "Lindsay Blackwell":"PhD Student"
 ## "Reginald Beasley":"Admissions and Student Affairs Assistant"
@@ -68,7 +75,11 @@ htmldoc = response.text
 
 soup = BeautifulSoup(htmldoc,"html.parser")
 people = soup.find_all("div",{"class":"views-row"})
+# division= people.find_all("div", {"class": "field-item even"})
+print (len(people[0]))
 umsi_titles = {}
+umsi_name=[]
+umsi_position=[]
 
 ## It may be helpful to translate the following from English to code:
 
@@ -93,7 +104,7 @@ class HW4_Part2(unittest.TestCase):
 	def test_first_last_elem(self):
 		self.assertEqual(type(nytimes_headlines[0]),type(""), "Testing that the first type in the nytimes_headlines list is a string")
 		self.assertEqual(type(nytimes_headlines[-1]),type(""), "Testing that the last type in the nytimes_headlines list is a string")
-	def length_of_ten(self):
+	def test_length_of_ten(self):
 		self.assertEqual(len(nytimes_headlines),10, "Testing that there are ten headlines in the list")
 
 class HW4_Part3(unittest.TestCase):
