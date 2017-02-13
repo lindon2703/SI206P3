@@ -1,6 +1,7 @@
 import unittest
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
 ## SI 206 - W17 - HW4
@@ -76,10 +77,28 @@ htmldoc = response.text
 soup = BeautifulSoup(htmldoc,"html.parser")
 people = soup.find_all("div",{"class":"views-row"})
 # division= people.find_all("div", {"class": "field-item even"})
-print (len(people[0]))
 umsi_titles = {}
 umsi_name=[]
 umsi_position=[]
+
+#print (people)
+
+for x in people:
+	asdf= x.find_all("div", {"class": "field-item even", "property": "dc:title"})
+	result= str(asdf)[54:-12]
+	umsi_name.append(result)
+	title= (x.find_all("div", {"class":"field field-name-field-person-titles field-type-text field-label-hidden"}))
+	y= str(title)[140:-19]
+	#print (y)
+	umsi_position.append(y)
+for x in range(len(umsi_position)):
+	umsi_titles[umsi_name[x]]= umsi_position[x]
+
+#print (umsi_position)
+# for y in people:
+# 	asdf= y.find_all("div", {"class": "field-item even"})
+# 	print (str(asdf))
+
 
 ## It may be helpful to translate the following from English to code:
 
