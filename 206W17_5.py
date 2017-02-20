@@ -2,15 +2,17 @@ import unittest
 import tweepy
 import requests
 import json
+import twitter_info as ti
 
 ## SI 206 - W17 - HW5
 ## COMMENT WITH:
-## Your section day/time:
+## Your section day/time: Thursday 6-7
 ## Any names of people you worked with on this assignment:
 
 ######## 500 points total ########
 
-## Write code that uses the tweepy library to search for tweets with a phrase of the user's choice (should use the Python input function), and prints out the Tweet text and the created_at value (note that this will be in GMT time) of the first THREE tweets with at least 1 blank line in between each of them, e.g.
+## Write code that uses the tweepy library to search for tweets with a phrase of the user's choice (should use the Python input function), 
+## and prints out the Tweet text and the created_at value (note that this will be in GMT time) of the first THREE tweets with at least 1 blank line in between each of them, e.g.
 
 ## TEXT: I'm an awesome Python programmer.
 ## CREATED AT: Sat Feb 11 04:28:19 +0000 2017
@@ -35,16 +37,91 @@ import json
 ## **** If you choose not to do that, we strongly advise using authentication information for an 'extra' Twitter account you make just for this class, and not your personal account, because it's not ideal to share your authentication information for a real account that you use frequently.
 
 ## Get your secret values to authenticate to Twitter. You may replace each of these with variables rather than filling in the empty strings if you choose to do the secure way for 50 EC points
-consumer_key = "" 
-consumer_secret = ""
-access_token = ""
-access_token_secret = ""
+# def twitter_search_body():
+# 	public_tweets = api.search(q= intended_search)
+# 	output_string= ""
+# 	for tweet in public_tweets["statuses"][:3]:    
+# 		output_string+= str(tweet["text"])+ "\n" 
+# 		output_string+= "\n"    
+# 		output_string+= str(tweet["created_at"])+ "\n"
+# 		output_string+= "\n" 
+# 	print (output_string)
+# 	CACHE_DICTION[intended_search]= output_string
+# 	return CACHE_DICTION
+
+consumer_key= ti.consumer_key
+consumer_secret= ti.consumer_secret
+access_token= ti.access_token
+access_token_secret= ti.access_token_secret
 ## Set up your authentication to Twitter
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to grab stuff from twitter with your authentication, and return it in a JSON-formatted way
+api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) 
+receiver= {}
 
-## Write the rest of your code here!
+intended_search= input()
+CACHE_FNAME= "cache_fil.json"
+try:
+	
+	cache_file_obj= open(CACHE_FNAME, 'r')
+	cache_file_contents= cache_file_obj.read()
+	CACHE_DICTION= json.loads(cache_file_contents)
+	key= list(CACHE_DICTION.keys())[0]
+	count=1
+
+	for past_search in CACHE_DICTION:
+		
+		if past_search == intended_search:
+		
+			print (CACHE_DICTION[past_search])
+			cache_file_obj.close()
+			break
+		elif (count== len(list(CACHE_DICTION.keys()))):
+			
+			cache_file_obj.close()
+			public_tweets = api.search(q= intended_search)
+			output_string= ""
+			for tweet in public_tweets["statuses"][:3]:    
+				output_string+= str(tweet["text"])+ "\n" 
+				output_string+= "\n"    
+				output_string+= str(tweet["created_at"])+ "\n"
+				output_string+= "\n" 
+			print (output_string)
+			CACHE_DICTION[intended_search]= output_string
+			cache_file_obj= open(CACHE_FNAME, 'w')
+			cache_file_obj.write(json.dumps(CACHE_DICTION))
+			count+=1
+
+except:
+	#print ("hey")
+	cache_file_obj= open(CACHE_FNAME, 'w')
+	CACHE_DICTION= {}
+	public_tweets = api.search(q= intended_search)
+	output_string= ""
+	for tweet in public_tweets["statuses"][:3]:    
+		output_string+= str(tweet["text"])+ "\n" 
+		output_string+= "\n"    
+		output_string+= str(tweet["created_at"])+ "\n"
+		output_string+= "\n" 
+		#print ("woo")
+		#print (output_string)
+	print (output_string)
+	CACHE_DICTION[intended_search]= output_string
+	cache_file_obj= open(CACHE_FNAME, 'w')
+	cache_file_obj.write(json.dumps(CACHE_DICTION))
+	cache_file_obj.close()
+# def twitter_search_body():
+# 	public_tweets = api.search(q= intended_search)
+# 	output_string= ""
+# 	for tweet in public_tweets["statuses"][:3]:    
+# 		output_string+= (tweet["text"])
+# 		output_string+= ("\n")     
+# 		output_string+= (tweet["created_at"])     
+# 		output_string+= ("\n") 
+# 		print (output_string)
+# 	CACHE_DICTION[intended_search]= output_string
+
+
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except statement shown in class.
