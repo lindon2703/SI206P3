@@ -33,7 +33,15 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 ## Part 0 -- CACHING SETUP
 
 ## Write the code to begin your caching pattern setup here.
-
+CACHE_FNAME= "p2caching.json"
+try:
+	cache_file= open(CACHE_FNAME, 'r')
+	cache_contents= cache_file.read()
+	CACHE_DICTION= json.loads(cache_contents)
+	cache_file.close()
+except:
+	CACHE_DICTION= {}
+	#CACHE_DICTION
 
 
 
@@ -66,6 +74,25 @@ def find_urls(string):
 ## Start with this page: https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All  
 ## End with this page: https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page=11 
 def get_umsi_data():
+	if ("umsi_data" in CACHE_DICTION):
+		return CACHE_DICTION["umsi_data"]
+	html_list=[]
+	for x in range(12):
+		if x == 0:
+			url= "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All"
+			response= requests.get(url, headers={'User-Agent': 'SI_CLASS'})
+			result= response.text
+			html_list.append(result)
+			
+		else:
+			url= "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page="+str(x)
+			response= requests.get(url, headers={'User-Agent': 'SI_CLASS'})
+			result= response.text
+			html_list.append(result)
+
+	CACHE_DICTION["umsi_data"]= html_list
+	return html_list
+	
 
 
 
@@ -74,9 +101,26 @@ def get_umsi_data():
 
 
 ## PART 2 (b) - Create a dictionary saved in a variable umsi_titles 
-## whose keys are UMSI people's names, and whose associated values are those people's titles, e.g. "PhD student" or "Associate Professor of Information"...
-
-
+## whose keys are UMSI people's names, and whose associated values are those people's titles, e.g. "PhD student" or "Associate Professor of Information"...	
+get_umsi_data()
+umsi_titles = {}
+for every in CACHE_DICTION["umsi_data"]:
+	soup = BeautifulSoup(every,"html.parser")
+	people = soup.find_all("div",{"class":"views-row"})
+	# division= people.find_all("div", {"class": "field-item even"})
+	umsi_name=[]
+	umsi_position=[]
+	#print (people)
+	for x in people:
+		asdf= x.find_all("div", {"class": "field-item even", "property": "dc:title"})
+		result= str(asdf)[54:-12]
+		umsi_name.append(result)
+		title= (x.find_all("div", {"class":"field field-name-field-person-titles field-type-text field-label-hidden"}))
+		y= str(title)[140:-19]
+		#print (y)
+		umsi_position.append(y)
+	for x in range(len(umsi_position)):
+		umsi_titles[umsi_name[x]]= umsi_position[x]
 
 
 
@@ -86,7 +130,16 @@ def get_umsi_data():
 ## INPUT: Any string
 ## Behavior: See instructions. Should search for the input string on twitter and get results. Should check for cached data, use it if possible, and if not, cache the data retrieved.
 ## RETURN VALUE: A list of strings: A list of just the text of 5 different tweets that result from the search.
-
+def get_five_tweets(string):
+	if string in CACHE_DICTION.keys():
+		return CACHE_DICTION[string]
+	public_tweets = api.search(q= intended_search)
+	first_five_tweets= []
+	for tweet in public_tweets["statuses"][:5]:    
+		output_string= str(tweet["text"])
+		first_five_tweets.append(output_string)
+	CACHE_DICTION[string]= first_five_tweets
+			
 
 
 
@@ -167,3 +220,4 @@ class PartThree(unittest.TestCase):
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
+	print (sorted(umsi_titles.keys())[:10])
