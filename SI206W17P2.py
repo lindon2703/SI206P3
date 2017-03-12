@@ -245,4 +245,4 @@ class PartThree(unittest.TestCase):
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
-	print (sorted(umsi_titles.values())[:10])
+	#print (sorted(umsi_titles.values())[:10])
