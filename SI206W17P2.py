@@ -45,6 +45,7 @@ except:
 
 
 
+
 ## PART 1 - Define a function find_urls.
 ## INPUT: any string
 ## RETURN VALUE: a list of strings that represents all of the URLs in the input string
@@ -118,6 +119,9 @@ for every in umsi_data:
 		title= (x.find_all("div", {"class":"field field-name-field-person-titles field-type-text field-label-hidden"}))
 		y= str(title)[140:-19]
 		#print (y)
+		if "amp;" in y:
+			spl= y.split("amp;")
+			y= ("").join(spl)
 		umsi_position.append(y)
 	for x in range(len(umsi_position)):
 		umsi_titles[umsi_name[x]]= umsi_position[x]
@@ -241,4 +245,4 @@ class PartThree(unittest.TestCase):
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
-	print (sorted(umsi_titles.keys())[:10])
+	print (sorted(umsi_titles.values())[:10])
