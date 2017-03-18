@@ -179,11 +179,15 @@ print("\n\n***** Problem 10 *****")
 
 # Define readfiles (make sure to close the file reference in the right place)
 def readfiles(listoffile):
-
+    for everyfile in listoffile:
+        fileref= open(everyfile, 'r')
+        for everyline in fileref:
+            yield everyline
+        fileref.close()
 
 # Define len_check
 def len_check(file_line_gen):
-
+    return (line for line in file_line_gen if len(line)>= 40)
 
 # Define main_filterer
 
