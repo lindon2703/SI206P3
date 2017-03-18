@@ -190,7 +190,9 @@ def len_check(file_line_gen):
     return (line for line in file_line_gen if len(line)>= 40)
 
 # Define main_filterer
-
+def main_filterer(listoffile):
+    for every in len_check(readfiles(listoffile)):
+        yield every
 
 
 ## Uncomment this code to test so you can see easily what results from your code. DO uncomment it. DO NOT delete or change it. (You can add other code above while you work, of course.)
