@@ -12,7 +12,8 @@ import random
 ## [PROBLEM 1]
 print("\n\n***** Problem 1 *****")
 ## We've provided a definition of a class Student, similar to the one you may have seen in lecture. 
-## Add a method to class Student called write_programs which accepts one optional parameter with a default value of 1, and adds the input integer to the self.num_programs instance variable.
+## Add a method to class Student called write_programs which accepts one optional parameter with a default value of 1, 
+## and adds the input integer to the self.num_programs instance variable.
 
 class Student():
     def __init__(self, name, years_at_umich=1, programs_written=0):
@@ -31,6 +32,9 @@ class Student():
         return this_Student.years_UM
 
     # Define the additional method here
+    def write_programs(self, option= 1):
+        self.num_programs+= option
+
     
 
 #### DONE WITH STUDENT CLASS DEFINITION
@@ -55,7 +59,11 @@ print("\n\n***** Problem 2 *****")
 ## The function should invoke the input function upon each element of the input list, and accumulate the return values to a new list.
 ## The function should return the new list of accumulated -- mapped! -- values.
 ## HINT: you should be able to write this in 5 lines of code or fewer! 
-
+def personal_map(func, alist):
+    new_list= []
+    for every_item in alist:
+        new_list.append(func(every_item))
+    return new_list
 
 
 
@@ -64,7 +72,8 @@ print("\n\n***** Problem 2 *****")
 ## [PROBLEM 3]
 print("\n\n***** Problem 3 *****")
 
-## We've provided the function access_third_elem. Write a lambda function that does exactly the same thing as access_third_elem (you can assume any input it would receive has at least 3 elements in it). Assign that lambda function to the variable sample_func.
+## We've provided the function access_third_elem. Write a lambda function that does exactly the same thing as a
+## ccess_third_elem (you can assume any input it would receive has at least 3 elements in it). Assign that lambda function to the variable sample_func.
 
 ## Note that we cannot specifically test in the unit tests whether it is a lambda function, but you will not get points for this question unless it is.
 
@@ -74,7 +83,7 @@ def access_third_elem(seq):
 ## End
 
 # Write your equivalent function and assignment statement here
-
+sample_func= lambda seq: seq[2]
 
 ## [PROBLEM 4]
 print("\n\n***** Problem 4 *****")
@@ -86,10 +95,10 @@ programs_written = [10, 500, 20, 131, 46]
 ## End provided code
 
 # Given that provided code, write one line of code to create a zip iterator instance saved in a variable called student_tups, here:
-
+student_tups= zip(names, seniority, programs_written)
 
 # Then write a line of code to cast the iterator to a list (it should end up as a list of tuples). Save that list in a variable called student_tups_list.
-
+student_tups_list= list(student_tups)
 
 ## You can test this out with any code you like here, and similar below other problems, but make sure to comment out any code that uses up the iterator in order to pass the tests!
     
@@ -97,8 +106,9 @@ programs_written = [10, 500, 20, 131, 46]
 
 ## [PROBLEM 5]
 print("\n\n***** Problem 5 *****")
-# Use a list comprehension to create a list of Student instances out of the student_tups list you just created in Problem 2, and save that list in a variable called programmers. You should make sure you pass these tests before continuing, as you'll need this list for problems later on!
-
+# Use a list comprehension to create a list of Student instances out of the student_tups list you just created in Problem 2, and save that list in a variable called programmers. 
+# You should make sure you pass these tests before continuing, as you'll need this list for problems later on!
+programmers= [Student(x, y, z) for (x, y, z) in student_tups_list]
 
 
 ## [PROBLEM 6]
@@ -111,34 +121,44 @@ print("\n\n***** Problem 6 *****")
 ## Write code to cast that iterator to a list. Save that list in the variable prod_list.
 
 ## You may add a method to the Student class if you wish in order to do this, but you do not need to. (If you do, make sure you do not create any syntax errors that keep code/tests from running!)
-
+def q6func(astudent):
+    return (astudent.num_programs/ astudent.years_UM)
+prod_iter= map (q6func, programmers)
+prod_list= list(prod_iter)
 
 
 ## [PROBLEM 7]
 print("\n\n***** Problem 7 *****")
-# Create a list of tuples wherein each tuple has a student's name and productivity value. Save the list of tuples in a variable called names_and_productivities. To do this, you should use a list comprehension (you may also use the zip function, and you may use any variables you have already created).
+# Create a list of tuples wherein each tuple has a student's name and productivity value. 
+# Save the list of tuples in a variable called names_and_productivities. To do this, you should use a list comprehension (you may also use the zip function, and you may use any variables you have already created).
 
 ## But be careful that if you use answers from previous problems, you use the LISTs you generated, so that all your tests can still pass and you avoid confusion!
-
+names_and_productivities= []
+for every in range(len(programmers)):
+    names_and_productivities.append((programmers[every].name, prod_list[every]))
 
 
 ## [PROBLEM 8]
 print("\n\n***** Problem 8 *****")
-# Use the Python filter function to select the subset of programmers who have names with 5 or more characters. (i.e. ["Albert","Dinesh","Euijin"]) Your result should be an filter object that points to Student instances. Save that filter iterator in a variable called long_names.
+# Use the Python filter function to select the subset of programmers who have names with 5 or more characters. (i.e. ["Albert","Dinesh","Euijin"]) 
+# Your result should be an filter object that points to Student instances. Save that filter iterator in a variable called long_names.
 
 
 
 ## Then write code to cast the value of long_names to a list and save it in the variable long_names_list. 
+long_names= filter(lambda x: len(x.name)>=5, programmers)
+long_names_list= list(long_names)
 
 
 
 ## [PROBLEM 9]
 print("\n\n***** Problem 9 *****")
 
-# Use a list comprehension to generate a LIST of just the names of those Student instances whose name is longer than their seniority (i.e., ["Albert", "Mai", "Dinesh", "Euijin"]). Assign it to a variable called names_with_not_too_much_seniority.
+# Use a list comprehension to generate a LIST of just the names of those Student instances whose name is longer than their seniority (i.e., ["Albert", "Mai", "Dinesh", "Euijin"]). 
+# Assign it to a variable called names_with_not_too_much_seniority.
 
 ## Note that you can use another list you have already created for this problem.
-
+names_with_not_too_much_seniority= [student.name for student in programmers if len(student.name)>= (student.years_UM)]
 
 
 
@@ -158,9 +178,11 @@ print("\n\n***** Problem 10 *****")
 ## We have provided files samplehw6_1.txt and samplehw6_2.txt for your use for this problem, which hopefully you have downloaded, so you can test with those file names! The test below also relies upon these files. Of course, you could also create other files for testing.
 
 # Define readfiles (make sure to close the file reference in the right place)
+def readfiles(listoffile):
 
 
 # Define len_check
+def len_check(file_line_gen):
 
 
 # Define main_filterer
@@ -256,4 +278,6 @@ class Problem10(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # for x in programmers:
+    #     print (x.name)
     unittest.main(verbosity=2)
