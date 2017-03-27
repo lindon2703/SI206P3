@@ -55,20 +55,25 @@ except:
 # Your function must cache data it retrieves and rely on a cache file!
 # Note that this is a lot like work you have done already in class (but, depending upon what you did previously, may not be EXACTLY the same, so be careful your code does exactly what you want here).
 def get_user_tweets(userhandle):
-	pass
+	if userhandle in CACHE_DICTION: return CACHE_DICTION[userhandle]
+	tweetsresult= api.user_timeline(userhandle)
+	CACHE_DICTION[userhandle]= tweetsresult
+	return tweetsresult
 
 
 
 
 # Write code to create/build a connection to a database: tweets.db,
 # And then load all of those tweets you got from Twitter into a database table called Tweets, with the following columns in each row:
+
 conn= sqlite3.connect("tweets.db")
 conncur= conn.cursor()
 conncur.execute("DROP TABLE IF EXISTS Tweets")
 conncur.execute("CREATE TABLE Tweets (tweet_id INTEGER, author TEXT, time_posted TIMESTAMP, tweet_text TEXT, retweets INTEGER)")
-umsi_tweets= get_user_tweets()
+umsi_tweets= get_user_tweets("UMSI")
+
 for every_tweet in umsi_tweets:
-	conncur.execute("INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES(?, ?, ?, ?, ?)", ())
+	conncur.execute("INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES(?, ?, ?, ?, ?)", (every_tweet['user']['id'], every_tweet['user']['screen_name'], every_tweet['user']['created_at'], every_tweet['user']['description'], every_tweet['retweet_count']))
 conn.commit()
 
 ## tweet_id - containing the unique id that belongs to each tweet
@@ -143,7 +148,9 @@ conn.commit()
 
 
 
-
+cache_file= open(CACHE_FNAME, 'w')
+cache_file.write(json.dumps(CACHE_DICTION))
+cache_file.close()
 
 #########
 print("*** OUTPUT OF TESTS BELOW THIS LINE ***")
@@ -193,4 +200,7 @@ class PartThree(unittest.TestCase):
 
 
 if __name__ == "__main__":
+	asdf= get_user_tweets("umich")
+	print (len(asdf))
+	print (asdf[0])
 	unittest.main(verbosity=2)
