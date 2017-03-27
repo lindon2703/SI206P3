@@ -73,7 +73,7 @@ conncur.execute("CREATE TABLE Tweets (tweet_id INTEGER, author TEXT, time_posted
 umsi_tweets= get_user_tweets("UMSI")
 
 for every_tweet in umsi_tweets:
-	conncur.execute("INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES(?, ?, ?, ?, ?)", (every_tweet['user']['id'], every_tweet['user']['screen_name'], every_tweet['user']['created_at'], every_tweet['user']['description'], every_tweet['retweet_count']))
+	conncur.execute("INSERT INTO Tweets (tweet_id, author, time_posted, tweet_text, retweets) VALUES(?, ?, ?, ?, ?)", (every_tweet['id'], every_tweet['user']['screen_name'], every_tweet['created_at'], every_tweet['text'], every_tweet['retweet_count']))
 conn.commit()
 
 ## tweet_id - containing the unique id that belongs to each tweet
@@ -118,18 +118,33 @@ conn.commit()
 
 
 # Select from the database all of the TIMES the tweets you collected were posted and fetch all the tuples that contain them in to the variable tweet_posted_times.
-
+tweet_posted_times= []
+for timepost in conncur.execute("SELECT time_posted FROM Tweets"):
+	tweet_posted_times.append(timepost)
 
 # Select all of the tweets (the full rows/tuples of information) that have been retweeted MORE than 2 times, and fetch them into the variable more_than_2_rts.
+more_than_2_rts=[]
+for bigretweet in conncur.execute("SELECT * FROM Tweets WHERE retweets>2 "):
+	more_than_2_rts.append(bigretweet)
+
+
+# Select all of the TEXT values of the tweets that are retweets of another account (i.e. have "RT" at the beginning of the tweet text). 
+# Save the FIRST ONE from that group of text values in the variable first_rt. Note that first_rt should contain a single string value, not a tuple.
+rttweet= []
+for allrt in conncur.execute("SELECT tweet_text FROM Tweets"):
+	rttweet.append(allrt)
+for every in rttweet:
+	#print (str(every)[2:4])
+	if str(every)[2:4]== ("RT"):
+		#print ("hi")
+		first_rt= str(every)[2: -2]
+		break
 
 
 
-# Select all of the TEXT values of the tweets that are retweets of another account (i.e. have "RT" at the beginning of the tweet text). Save the FIRST ONE from that group of text values in the variable first_rt. Note that first_rt should contain a single string value, not a tuple.
-
-
-
+# artist = \'The Ramones\'
 # Finally, done with database stuff for a bit: write a line of code to close the cursor to the database.
-
+conn.close()
 
 
 ## [PART 3] - Processing data
@@ -145,6 +160,9 @@ conn.commit()
 # Also note that the SET type is what this function should return, NOT a list or tuple. We looked at very briefly at sets when we looked at set comprehensions last week. In a Python 3 set, which is a special data type, it's a lot like a combination of a list and a dictionary: no key-value pairs, BUT each element in a set is by definition unique. You can't have duplicates.
 
 # If you want to challenge yourself here -- this function definition (what goes under the def statement) CAN be written in one line! Definitely, definitely fine to write it with multiple lines, too, which will be much easier and clearer.
+def get_twitter_users(input_string):
+	return set([y for y in re.findall(u"\@(\w+\_*\w*\_*\w*\_*)", input_string)])
+
 
 
 
@@ -200,7 +218,6 @@ class PartThree(unittest.TestCase):
 
 
 if __name__ == "__main__":
-	asdf= get_user_tweets("umich")
-	print (len(asdf))
-	print (asdf[0])
+	# asdf= get_user_tweets("umich")
+	# print (asdf[-1])
 	unittest.main(verbosity=2)
