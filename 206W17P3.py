@@ -93,14 +93,22 @@ umich_tweets= get_user_tweets("umich")
 ## HINT #2: You may want to go back to a structure we used in class this week to ensure that you reference the user correctly in each Tweet record.
 ## HINT #3: The users mentioned in each tweet are included in the tweet dictionary -- you don't need to do any manipulation of the Tweet text to find out which they are! Do some nested data investigation on a dictionary that represents 1 tweet to see it!
 
+conn = sqlite3.connect('project3_tweets.db')
+cur = conn.cursor()
 
+cur.execute('DROP TABLE IF EXISTS Tweets')
+cur.execute("CREATE TABLE Tweets(tweet_id TEXT PRIMARY KEY, text TEXT, user_id TEXT, time_posted TIMESTAMP, retweets INTEGER)")
 
+cur.execute('DROP TABLE IF EXISTS Users')
+cur.execute("CREATE TABLE Users(user_id TEXT PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)")
 
-
-
-
-
-
+#print (umich_tweets[0]["entities"]["user_mentions"])
+for every_tweet in umich_tweets:
+	cur.execute("INSERT OR IGNORE INTO Tweets (tweet_id, text, user_id, time_posted, retweets) VALUES (?, ?, ?, ?, ?)", (every_tweet['id'], every_tweet["text"], every_tweet["user"]["id"], every_tweet["created_at"], every_tweet["retweet_count"]))
+	#cur.execute("INSERT OR IGNORE INTO Users (user_id, screen_name, num_favs, description) VALUES(?, ?, ?, ?)", (every_tweet['id'], every_tweet['user']["screen_name"], every_tweet['user']['favourites_count'], every_tweet["user"]['description']))
+	for every_user in every_tweet["entities"]["user_mentions"]:
+		the_user= api.get_user(every_user["screen_name"])
+		cur.execute("INSERT OR IGNORE INTO Users (user_id, screen_name, num_favs, description) VALUES(?, ?, ?, ?)", (the_user['id'], the_user["screen_name"], the_user['favourites_count'], the_user['description']))
 
 
 ## Task 3 - Making queries, saving data, fetching data
@@ -108,12 +116,13 @@ umich_tweets= get_user_tweets("umich")
 # All of the following sub-tasks require writing SQL statements and executing them using Python.
 
 # Make a query to select all of the records in the Users database. Save the list of tuples in a variable called users_info.
+users_info= cur.execute("SELECT * FROM Users")
 
 # Make a query to select all of the user screen names from the database. Save a resulting list of strings (NOT tuples, the strings inside them!) in the variable screen_names. HINT: a list comprehension will make this easier to complete!
-
+screen_names= [str(x) for x in cur.execute("SELECT screen_name from Users")]
 
 # Make a query to select all of the tweets (full rows of tweet information) that have been retweeted more than 25 times. Save the result (a list of tuples, or an empty list) in a variable called more_than_25_rts.
-
+more_than_25_rts= cur.execute("SELECT * FROM Tweets WHERE retweets > 25")
 
 
 # Make a query to select all the descriptions (descriptions only) of the users who have favorited more than 25 tweets. Access all those strings, and save them in a variable called descriptions_fav_users, which should ultimately be a list of strings.
@@ -145,7 +154,8 @@ umich_tweets= get_user_tweets("umich")
 cache_file= open(CACHE_FNAME, 'w')
 cache_file.write(json.dumps(CACHE_DICTION))
 cache_file.close()
-#conn.close()
+conn.commit()
+cur.close()
 
 ###### TESTS APPEAR BELOW THIS LINE ######
 ###### Note that the tests are necessary to pass, but not sufficient -- must make sure you've followed the instructions accurately! ######
@@ -261,4 +271,5 @@ class Task4(unittest.TestCase):
 
 
 if __name__ == "__main__":
+	pass
 	unittest.main(verbosity=2)
